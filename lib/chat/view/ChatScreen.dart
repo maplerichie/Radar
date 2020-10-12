@@ -1,6 +1,8 @@
+import 'package:Radar/chat/model/Message.dart';
 import 'package:Radar/requests/controller/RequestsController.dart';
 import 'package:Radar/chat/view/ChatInput.dart';
 import 'package:Radar/chat/view/ChatItem.dart';
+import 'package:Radar/chat/view/ChatAppBar.dart';
 import 'package:Radar/utils/DisconnectedDialog.dart';
 import 'package:Radar/utils/Role.dart';
 import 'package:flutter/material.dart';
@@ -49,37 +51,34 @@ class ChatScreen extends StatelessWidget {
         });
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text('Chat'),
-            backgroundColor: Color.fromARGB(255, 22, 86, 189),
-          ),
-          body: SafeArea(
-            child: Column(
-              children: <Widget>[
-                Card(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    leading: Icon(Icons.info_outline_rounded, color: Color.fromARGB(255, 22, 86, 189)),
-                    title: Text(_role.requestTitle ?? 'Title'),
-                    subtitle: Text(_role.requestDescription ??
-                        'Maiores dolor quibusdam esse minus in. Fuga incidunt quaerat temporibus harum nemo impedit quibusdam expedita suscipit. Ut dicta dolore labore consequuntur itaque. Incidunt sed autem ea autem molestiae ducimus.'),
-                  ),
-                ),
-                Flexible(
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) => ChatItem(
-                      message: _role.messages[index],
+          body: Column(
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: <Widget>[
+                    ChatAppBar(
+                      title: _role.requestTitle,
+                      description: _role.requestDescription,
                     ),
-                    itemCount: _role.messages.length,
-                    controller: _scrollController,
-                  ),
+                    SliverPadding(
+                      padding: EdgeInsets.all(10),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int i) => ChatItem(
+                            message: _role.messages[i],
+                          ),
+                          childCount: _role.messages.length,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                ChatInput(
-                  sendMessage: _role.sendMessage,
-                ),
-              ],
-            ),
+              ),
+              ChatInput(
+                sendMessage: _role.sendMessage,
+              ),
+            ],
           ),
         );
       },
